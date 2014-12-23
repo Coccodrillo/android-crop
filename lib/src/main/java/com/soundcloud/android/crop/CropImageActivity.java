@@ -23,6 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
+
 import com.soundcloud.android.crop.util.Log;
 
 import java.io.IOException;
@@ -411,6 +413,12 @@ public class CropImageActivity extends MonitoredActivity {
                 outputStream = getContentResolver().openOutputStream(saveUri);
                 if (outputStream != null) {
                     croppedImage.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
+                    Bitmap target = croppedImage.copy(croppedImage.getConfig(), true);
+                    Canvas canvas = new Canvas(target);
+                    Matrix matrix = new Matrix();
+                    matrix.setRotate(exifRotation, croppedImage.getWidth()/2, croppedImage.getHeight()/2);
+                    canvas.drawBitmap(croppedImage, matrix, new Paint());
+                    target.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
                 }
             } catch (IOException e) {
                 setResultException(e);
